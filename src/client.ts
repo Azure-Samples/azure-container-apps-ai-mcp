@@ -5,6 +5,7 @@ import { Transport } from "@modelcontextprotocol/sdk/shared/transport";
 import dotenv from "dotenv";
 import { AzureOpenAI, OpenAI } from "openai";
 import { z } from "zod"; // Import zod for schema validation
+import { openAiToolAdapter } from "./helpers/openai-tool-adapter";
 dotenv.config();
 
 // You will need to set these environment variables or edit the following values
@@ -42,28 +43,6 @@ else if (!OPENAI_API_KEY && endpoint) {
     apiVersion,
     deployment,
   });
-}
-
-function openAiToolAdapter(tool: {
-  name: string;
-  description?: string;
-  input_schema: any;
-}) {
-  // Create a zod schema based on the input_schema
-  const schema = z.object(tool.input_schema);
-
-  return {
-    type: "function",
-    function: {
-      name: tool.name,
-      description: tool.description,
-      parameters: {
-        type: "object",
-        properties: tool.input_schema.properties,
-        required: tool.input_schema.required,
-      },
-    },
-  };
 }
 
 class MCPClient {
