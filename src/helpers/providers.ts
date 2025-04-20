@@ -10,19 +10,23 @@ const openaiApiKey = process.env["OPENAI_API_KEY"] as string;
 const azureOpenAiApiKey = process.env["AZURE_OPENAI_API_KEY"] as string;
 const endpoint = process.env["AZURE_OPENAI_ENDPOINT"] as string;
 const apiVersion = "2025-01-01-preview";
-const deployment = process.env["MODEL"] as string;
+let model = process.env["MODEL"] as string;
+const githubModel = process.env["GITHUB_MODEL"] as string;
 let client: AzureOpenAI | OpenAI | null = null;
 
 if (githubToken) {
   // Initialize the OpenAI client with GitHub token
-  console.log("Using GitHub token for authentication");
+  console.log("Authentication method: GitHub token");
+
   client = new OpenAI({
     apiKey: githubToken,
     baseURL: "https://models.github.ai/inference",
   });
+  model = githubModel;
 } else if (openaiApiKey) {
   // Initialize the OpenAI client with API Key
-  console.log("Using OpenAI API Key");
+  console.log("Authentication method: OpenAI API Key");
+
   client = new OpenAI({
     apiKey: openaiApiKey,
   });
@@ -31,17 +35,17 @@ if (githubToken) {
   const opts: AzureClientOptions = {
     endpoint,
     apiVersion,
-    deployment,
+    deployment: model,
   };
 
   if (azureOpenAiApiKey) {
     // Initialize the Azure OpenAI client with API Key
-    console.log("Using Azure OpenAI API Key");
+    console.log("Authentication method: Azure OpenAI API Key");
     opts.apiKey = azureOpenAiApiKey;
   }
   else {
     // Initialize the Azure OpenAI client with Entra ID (Azure AD) authentication (keyless)
-    console.log("Using Azure OpenAI Keyless authentication");
+    console.log("Authentication method: Azure OpenAI Entra ID (keyless)");
     const credential = new DefaultAzureCredential();
     const scope = "https://cognitiveservices.azure.com/.default";
     opts.azureADTokenProvider = getBearerTokenProvider(credential, scope);
@@ -50,4 +54,4 @@ if (githubToken) {
   client = new AzureOpenAI(opts);
 }
 
-export { client, deployment as model };
+export { client, model };
