@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "math": {
+      "---": "Not yet supported. See https://github.com/modelcontextprotocol/inspector/issues/255",
+      "type": "sse",
+      "url": "http://localhost:4321/sse",
+      "env": {}
+    }
+  }
+}
