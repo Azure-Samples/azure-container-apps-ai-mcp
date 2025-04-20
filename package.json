@@ -17,7 +17,7 @@
     "@modelcontextprotocol/sdk": "^1.6.1",
     "dotenv": "^16.4.7",
     "express": "^5.0.1",
-    "openai": "^4.93.0 ",
+    "openai": "^4.95.0 ",
     "type": "^2.7.3",
     "zod": "^3.24.2"
   },
