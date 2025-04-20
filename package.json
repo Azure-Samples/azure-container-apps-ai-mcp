@@ -4,9 +4,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start:server": "tsc && node build/server.js",
-    "start:client": "tsc && node build/client.js",
-    "inspect:server": "npx @modelcontextprotocol/inspector node build/server.js"
+    "server": "tsc && node build/server.js",
+    "client": "tsc && node build/index.js",
+    "inspect": "npx @modelcontextprotocol/inspector node build/server.js"
   },
   "keywords": [],
   "author": "Wassim Chegham <github@wassim.dev>",
