@@ -10,10 +10,12 @@ This sample provides an MCP server implementation that supports the following fe
 | -------------- | --------- |
 | SSE            | ✅        |
 | HTTP Streaming |           |
+| AuthN/Z        |           |
 | Tools          | ✅        |
 | Resources      |           |
 | Prompts        |           |
 | Sampling       |           |
+
 
 ## Getting Started
 
