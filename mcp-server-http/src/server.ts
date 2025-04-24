@@ -1,18 +1,17 @@
-import chalk from 'chalk';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import {
   CallToolRequestSchema,
   JSONRPCError,
-  Notification,
   JSONRPCNotification,
   ListToolsRequestSchema,
   LoggingMessageNotification,
-} from '@modelcontextprotocol/sdk/types';
+  Notification,
+} from '@modelcontextprotocol/sdk/types.js';
 import { Request, Response } from 'express';
 import { randomUUID } from 'node:crypto';
-import { TodoTools } from './tools';
-import { logger } from './helpers/logs';
+import { logger } from './helpers/logs.js';
+import { TodoTools } from './tools.js';
 
 const log = logger('server');
 const JSON_RPC = '2.0';

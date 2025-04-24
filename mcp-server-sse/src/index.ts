@@ -1,9 +1,9 @@
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import express, { Request, Response } from 'express';
-import { SSEPServer } from './server';
-import { logger } from './helpers/logs';
+import { logger } from './helpers/logs.js';
+import { SSEPServer } from './server.js';
+
 const log = logger('index');
-const SSE_ENDPOINT = '/sse';
 
 const server = new SSEPServer(
   new Server(
@@ -25,12 +25,12 @@ app.use(express.json());
 const router = express.Router();
 
 // Legacy message endpoint for older clients
-router.post("/messages", async (req: Request, res: Response) => {
+router.post('/messages', async (req: Request, res: Response) => {
   await server.handlePostRequest(req, res);
 });
 
 // Legacy SSE endpoint for older clients
-router.get("/sse", async (req: Request, res: Response) => {
+router.get('/sse', async (req: Request, res: Response) => {
   await server.handleGetRequest(req, res);
 });
 

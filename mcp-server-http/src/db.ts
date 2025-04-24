@@ -1,52 +1,64 @@
-import Database from 'better-sqlite3';
-import { logger } from './helpers/logs';
+import pg from 'pg';
+import { logger } from './helpers/logs.js';
 
 const log = logger('db');
 const DB_NAME = 'todos';
 
-const db = new Database('todo.db');
-db.pragma('journal_mode = WAL');
-db.prepare(
-  `CREATE TABLE IF NOT EXISTS ${DB_NAME} (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  title TEXT NOT NULL,
-  completed INTEGER NOT NULL DEFAULT 0
-)`
-).run();
+const pool = new pg.Pool({
+  host: process.env.POSTGRES_HOST || 'postgres',
+  port: process.env.POSTGRES_PORT ? parseInt(process.env.POSTGRES_PORT) : 5432,
+  user: process.env.POSTGRES_USER || 'postgres',
+  password: process.env.POSTGRES_PASSWORD || 'postgres',
+  database: process.env.POSTGRES_DATABASE || 'todos',
+});
 
-log.success(`Database "${DB_NAME}" initialized.`);
+async function init() {
+  await pool.query(`CREATE TABLE IF NOT EXISTS ${DB_NAME} (
+    id SERIAL PRIMARY KEY,
+    title TEXT NOT NULL,
+    completed BOOLEAN NOT NULL DEFAULT FALSE
+  )`);
+  log.success(`Database "${DB_NAME}" initialized.`);
+}
+init();
 
-export function addTodo(title: string) {
+export async function addTodo(title: string) {
   log.info(`Adding TODO: ${title}`);
-  const stmt = db.prepare(`INSERT INTO todos (title, completed) VALUES (?, 0)`);
-  return stmt.run(title);
+  const result = await pool.query(
+    `INSERT INTO todos (title, completed) VALUES ($1, FALSE) RETURNING *`,
+    [title]
+  );
+  return result.rows[0];
 }
 
-export function listTodos() {
+export async function listTodos() {
   log.info('Listing all TODOs...');
-  return db.prepare(`SELECT id, title, completed FROM todos`).all() as Array<{
+  const result = await pool.query(`SELECT id, title, completed FROM todos`);
+  return result.rows as Array<{
     id: number;
     title: string;
-    completed: number;
+    completed: boolean;
   }>;
 }
 
-export function completeTodo(id: number) {
+export async function completeTodo(id: number) {
   log.info(`Completing TODO with ID: ${id}`);
-  const stmt = db.prepare(`UPDATE todos SET completed = 1 WHERE id = ?`);
-  return stmt.run(id);
+  const result = await pool.query(
+    `UPDATE todos SET completed = TRUE WHERE id = $1 RETURNING *`,
+    [id]
+  );
+  return { changes: result.rowCount };
 }
 
-export function deleteTodo(id: number) {
+export async function deleteTodo(id: number) {
   log.info(`Deleting TODO with ID: ${id}`);
-  const row = db.prepare(`SELECT title FROM todos WHERE id = ?`).get(id) as
-    | { title: string }
-    | undefined;
+  const rowResult = await pool.query(`SELECT title FROM todos WHERE id = $1`, [id]);
+  const row = rowResult.rows[0];
   if (!row) {
     log.error(`TODO with ID ${id} not found`);
     return null;
   }
-  db.prepare(`DELETE FROM todos WHERE id = ?`).run(id);
+  await pool.query(`DELETE FROM todos WHERE id = $1`, [id]);
   log.success(`TODO with ID ${id} deleted`);
   return row;
 }

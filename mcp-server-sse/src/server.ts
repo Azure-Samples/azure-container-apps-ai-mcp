@@ -3,14 +3,15 @@ import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js';
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
-} from '@modelcontextprotocol/sdk/types';
+} from '@modelcontextprotocol/sdk/types.js';
 import { Request, Response } from 'express';
-import { logger } from './helpers/logs';
 import { randomUUID } from 'node:crypto';
-import { TodoTools } from './tools';
+import { logger } from './helpers/logs.js';
+import { TodoTools } from './tools.js';
 
 const log = logger('server');
 const JSON_ERROR = 500;
+
 export class SSEPServer {
   server: Server;
   transport: SSEServerTransport | null = null;

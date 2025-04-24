@@ -1,7 +1,7 @@
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import express, { Request, Response } from 'express';
-import { StreamableHTTPServer } from './server';
-import { logger } from './helpers/logs';
+import { StreamableHTTPServer } from './server.js';
+import { logger } from './helpers/logs.js';
 const log = logger('index');
 
 const server = new StreamableHTTPServer(

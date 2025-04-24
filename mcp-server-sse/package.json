@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "tsx src/index.ts",
+    "build": "tsc",
     "dev": "tsx watch src/index.ts"
   },
   "keywords": [],
@@ -13,15 +14,19 @@
   "description": "",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.10.2",
-    "better-sqlite3": "^11.9.1",
+    "chalk": "^5.4.1",
+    "debug": "^4.4.0",
     "express": "^5.0.1",
+    "openai": "^4.96.0",
+    "pg": "^8.15.5",
     "type": "^2.7.3",
     "zod": "^3.24.2"
   },
   "devDependencies": {
-    "@types/better-sqlite3": "^7.6.13",
+    "@types/debug": "^4.1.12",
     "@types/express": "^5.0.0",
     "@types/node": "^20.11.24",
+    "@types/pg": "^8.11.14",
     "tsx": "^4.19.3",
     "typescript": "^5.3.3"
   },

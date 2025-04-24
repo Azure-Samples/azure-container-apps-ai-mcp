@@ -1,4 +1,4 @@
-import { addTodo, listTodos, completeTodo, deleteTodo } from './db';
+import { addTodo, listTodos, completeTodo, deleteTodo } from './db.js';
 
 export const TodoTools = [
   {
@@ -30,12 +30,12 @@ export const TodoTools = [
       required: ['content'],
     },
     async execute({ title }: { title: string }) {
-      const info = addTodo(title);
+      const info = await addTodo(title);
       return {
         content: [
           {
             type: 'text',
-            text: `Added TODO: ${title} (id: ${info.lastInsertRowid})`,
+            text: `Added TODO: ${title} (id: ${info.id})`,
           },
         ],
       };
@@ -68,7 +68,7 @@ export const TodoTools = [
       required: ['content'],
     },
     async execute() {
-      const tools = listTodos();
+      const tools = await listTodos();
       if (!tools || tools.length === 0) {
         return {
           content: [{ type: 'text', text: 'No TODOs found.' }],
@@ -115,7 +115,7 @@ export const TodoTools = [
       required: ['content'],
     },
     async execute({ id }: { id: number }) {
-      const info = completeTodo(id);
+      const info = await completeTodo(id);
       if (info.changes === 0) {
         return {
           content: [{ type: 'text', text: `TODO with id ${id} not found.` }],
@@ -155,7 +155,7 @@ export const TodoTools = [
       required: ['content'],
     },
     async execute({ id }: { id: number }) {
-      const row = deleteTodo(id);
+      const row = await deleteTodo(id);
       if (!row) {
         return {
           content: [{ type: 'text', text: `TODO with id ${id} not found.` }],
