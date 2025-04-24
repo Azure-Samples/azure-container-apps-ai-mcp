@@ -1,5 +1,5 @@
 {
-  "name": "mcp-http-server",
+  "name": "mcp-server-http",
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",
