@@ -3,7 +3,7 @@ dotenv.config();
 
 import { DefaultAzureCredential, getBearerTokenProvider } from "@azure/identity";
 import OpenAI, { AzureClientOptions, AzureOpenAI } from "openai";
-import { logger } from "../helpers/logs";
+import { logger } from "../helpers/logs.js";
 
 // You will need to set these environment variables or edit the following values
 const githubToken = process.env["GITHUB_TOKEN"] as string;

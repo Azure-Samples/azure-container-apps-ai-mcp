@@ -11,11 +11,11 @@ const config: MCPConfig = {
   servers: {
     'mcp-todo-http': {
       type: 'http',
-      url: 'http://localhost:3000/mcp',
+      url: process.env.MCP_SERVER_HTTP_URL ?? 'http://localhost:3000/mcp',
     },
     'mcp-todo-sse': {
       type: 'sse',
-      url: 'http://localhost:3001/sse',
+      url: process.env.MCP_SERVER_SSE_URL ?? 'http://localhost:3001/sse',
     },
   },
 };

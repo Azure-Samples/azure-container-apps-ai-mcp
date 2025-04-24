@@ -1,8 +1,8 @@
+import EventEmitter from 'node:events';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import { ToolListChangedNotificationSchema } from '@modelcontextprotocol/sdk/types.js';
-import EventEmitter from 'node:events';
-import { logger } from './helpers/logs';
+import { logger } from './helpers/logs.js';
 
 const log = logger('host');
 

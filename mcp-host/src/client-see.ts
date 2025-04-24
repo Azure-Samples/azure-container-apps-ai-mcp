@@ -1,7 +1,7 @@
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js';
 import type { Transport } from '@modelcontextprotocol/sdk/shared/transport';
-import { logger } from './helpers/logs';
+import { logger } from './helpers/logs.js';
 
 const log = logger('host');
 
