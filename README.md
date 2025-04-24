@@ -6,16 +6,15 @@ This project showcases how to use the MCP protocol with OpenAI. It provides a si
 
 This sample provides an MCP server implementation that supports the following features:
 
-| Feature        | Completed |
-| -------------- | --------- |
-| SSE            | ✅        |
-| HTTP Streaming |           |
-| AuthN/Z        |           |
-| Tools          | ✅        |
-| Resources      |           |
-| Prompts        |           |
-| Sampling       |           |
-
+| Feature             | Completed |
+| ------------------- | --------- |
+| SSE                 | ✅        |
+| HTTP Streaming      | ✅        |
+| AuthN (token based) | ✅        |
+| Tools               | ✅        |
+| Resources           |           |
+| Prompts             |           |
+| Sampling            |           |
 
 ## Getting Started
 
@@ -33,19 +32,22 @@ To get started with this project, follow the steps below:
 
 1. Clone the repository:
 
-   ```bash
-   git clone https://github.com/manekinekko/openai-mcp-example.git
-   cd openai-mcp-example
-   ```
+```bash
+git clone https://github.com/manekinekko/azure-openai-mcp-example.git
+cd azure-openai-mcp-example
+```
 
-2. Install the dependencies:
-   ```bash
-   npm install
-   ```
+3. cd into all folder and install the dependencies:
+
+```bash
+npm i --prefix mcp-host 
+npm i --prefix mcp-server-http 
+npm i --prefix mcp-server-sse 
+```
 
 ### Configuration
 
-This sample supports the follwowing providers:
+This sample supports the follwowing LLM providers:
 
 - Azure OpenAI,
 - OpenAI,
@@ -89,57 +91,29 @@ GITHUB_MODEL="openai/gpt-4.1"
 
 ### Usage
 
-1. Run the MCP server:
+1. First, run the MCP servers, in separate terminals:
 
-   ```bash
-   npm run server
-   ```
-
-2. Run the MCP host in a separate terminal:
-   ```bash
-   npm run host
-   ```
-
-You should see a response like the following:
-
-```text
-Authentication method: Azure OpenAI Entra ID (keyless)
-
-MCP Host Started!
-Connected to the following servers:
-* math-server: http://localhost:4321/sse
-Available tools:
-- calculate_sum: Calculate the sum of two numbers
-- calculate_product: Calculate the product of two numbers
-- calculate_difference: Calculate the difference of two numbers
-- calculate_division: Calculate the division of two numbers
-
-Query: what is 40+2?
-Agent:
-[Thinking] Using tool "calculate_sum" with args "{\"a\":40,\"b\":2}"
-[Thinking] Tool calculate_sum result: The sum of 40 and 2 is 42.
-[Thinking] The result of 40 + 2 is 42.
-
-Agent:
-The result of 40 + 2 is 42.
-
-Query:
+```bash
+npm start --prefix mcp-server-http
+npm start --prefix mcp-server-sse
 ```
+
+NOTE: you don't need to run both servers, you can choose one of them.
+
+1. Run the MCP host in a separate terminal:
+```bash
+npm start --prefix mcp-host
+```
+
+You should be able to use the MCP host to interat with the LLM agent. Try asking question about adding or listing items in a shopping list. The host will then try to fetch and call tools from the MCP servers.
 
 ## Debugging and inspection
 
 You can use the `DEBUG` environment variable to enable verbose logging for the OpenAI SDK:
 
 ```bash
-DEBUG=true npm run host
+DEBUG=mcp:* npm start
 ```
-
-In order to inspect the MCP servers, run the following command in a separate terminal, and follow the instructions:
-
-```bash
-npm run inspect
-```
-
 
 ## License
 
