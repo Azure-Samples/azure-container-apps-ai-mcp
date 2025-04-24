@@ -20,14 +20,13 @@ const JSON_RPC_ERROR = -32603;
 
 export class StreamableHTTPServer {
   server: Server;
-  transports: { [sessionId: string]: StreamableHTTPServerTransport } = {};
 
   constructor(server: Server) {
     this.server = server;
     this.setupServerRequestHandlers();
   }
 
-  async cleanup() {
+  async close() {
     log.info('Shutting down server...');
     await this.server.close();
     log.info('Server shutdown complete.');

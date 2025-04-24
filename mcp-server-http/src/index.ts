@@ -7,7 +7,7 @@ const log = logger('index');
 const server = new StreamableHTTPServer(
   new Server(
     {
-      name: 'todo-mcp-server',
+      name: 'todo-http-server',
       version: '1.0.0',
     },
     {
@@ -43,6 +43,6 @@ app.listen(PORT, () => {
 
 process.on('SIGINT', async () => {
   log.error('Shutting down server...');
-  await server.cleanup();
+  await server.close();
   process.exit(0);
 });
