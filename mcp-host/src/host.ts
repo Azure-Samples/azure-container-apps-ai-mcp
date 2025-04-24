@@ -4,7 +4,8 @@ import type {
   ChatCompletionMessageParam,
   ChatCompletionTool,
 } from 'openai/resources/index.js';
-import { MCPClient } from './client.js';
+import { MCPClient as MCPClientHTTP } from './client-http.js';
+import { MCPClient as MCPClientSSE } from './client-see.js';
 import { llm, model } from './config/providers.js';
 import { MCPConfig, MCPSEEServerConfig, ZodToolType } from './config/types.js';
 import { mcpToolToOpenAiToolChatCompletion } from './helpers/openai-tool-adapter.js';
@@ -13,9 +14,9 @@ import { logger } from './helpers/logs.js';
 const log = logger('host');
 
 export class MCPHost {
-  private mcpClients: MCPClient[] = [];
+  private mcpClients: Array<MCPClientHTTP | MCPClientSSE> = [];
   private openAiTools: ChatCompletionTool[] = [];
-  private toolsMap: { [name: string]: MCPClient } = {};
+  private toolsMap: { [name: string]: MCPClientHTTP | MCPClientSSE } = {};
   private servers: { serverName: string; server: MCPSEEServerConfig }[] =
     [] as any;
 
@@ -41,7 +42,19 @@ export class MCPHost {
     try {
       for (const serverName in this.config?.servers) {
         const server = this.config?.servers[serverName];
-        const mcp = new MCPClient(serverName, server.url);
+        let mcp: MCPClientHTTP | MCPClientSSE;
+        
+        if (server.type === 'http') {
+          log.info(`Connecting to HTTP server ${serverName} at ${server.url}`);
+          mcp = new MCPClientHTTP(serverName, server.url);
+        }
+        else if (server.type === 'sse') {
+          log.info(`Connecting to SSE server ${serverName} at ${server.url}`);
+          mcp = new MCPClientSSE(serverName, server.url);
+        } else {
+          throw new Error(`Unsupported server type: ${server.type}`);
+        }
+
         await mcp.connect();
         this.mcpClients.push(mcp);
         this.servers.push({ serverName, server });
@@ -62,6 +75,7 @@ export class MCPHost {
       }
       log.success('Connected to all MCP servers and loaded tools.');
     } catch (err: any) {
+      console.error({err})
       log.error('Failed to connect to MCP server: %O', err?.cause?.code || err);
       process.exit(1);
     }

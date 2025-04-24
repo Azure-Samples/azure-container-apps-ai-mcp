@@ -9,9 +9,13 @@ import chalk from 'chalk';
 
 const config: MCPConfig = {
   servers: {
-    'mcp-todo': {
+    'mcp-todo-http': {
       type: 'http',
       url: 'http://localhost:3000/mcp',
+    },
+    'mcp-todo-sse': {
+      type: 'sse',
+      url: 'http://localhost:3001/sse',
     },
   },
 };

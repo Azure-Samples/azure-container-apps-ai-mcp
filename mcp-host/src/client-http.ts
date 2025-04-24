@@ -10,7 +10,7 @@ export class MCPClient extends EventEmitter {
   private client: Client;
   private transport: StreamableHTTPClientTransport;
 
-  constructor(serverName: string, serverUrl: string, apikey?: string) {
+  constructor(serverName: string, serverUrl: string, accessToken?: string) {
     super();
     this.client = new Client({
       name: 'mcp-client-' + serverName,
@@ -19,13 +19,11 @@ export class MCPClient extends EventEmitter {
 
     let headers = {};
 
-    if (apikey) {
+    if (accessToken) {
       headers = {
-        Authorization: 'Bearer ' + apikey,
+        Authorization: 'Bearer ' + accessToken,
       };
     }
-
-    log.info('Connecting to MCP server %s at %s', serverName, serverUrl);
 
     this.transport = new StreamableHTTPClientTransport(new URL(serverUrl), {
       requestInit: {
@@ -45,9 +43,8 @@ export class MCPClient extends EventEmitter {
   }
 
   async connect() {
-    log.info('Connecting transport to server...');
     await this.client.connect(this.transport);
-    log.info('Connected to server');
+    log.success('Connected to server');
   }
 
   async getAvailableTools() {
