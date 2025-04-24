@@ -16,7 +16,6 @@ dist/
 build/
 
 # IDEs and editors
-.vscode/
 .idea/
 *.suo
 *.ntvs*
