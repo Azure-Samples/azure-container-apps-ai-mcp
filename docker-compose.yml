@@ -1,0 +1,53 @@
+services:
+  mcp-host:
+    build:
+      context: ./mcp-host
+    environment:
+      - NODE_ENV=production
+      - MCP_SERVER_HTTP_URL=http://mcp-server-http:3000/mcp
+      - MCP_SERVER_SSE_URL=http://mcp-server-sse:3001/sse
+    depends_on:
+      - mcp-server-http
+      - mcp-server-sse
+  mcp-server-http:
+    build:
+      context: ./mcp-server-http
+    ports:
+      - '3000:3000'
+    environment:
+      - NODE_ENV=production
+      - POSTGRES_HOST=host.docker.internal
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=todos
+      - POSTGRES_PORT=5432
+    depends_on:
+      - postgres
+  mcp-server-sse:
+    build:
+      context: ./mcp-server-sse
+    ports:
+      - '3001:3001'
+    environment:
+      - NODE_ENV=production
+      - POSTGRES_HOST=host.docker.internal
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=todos
+      - POSTGRES_PORT=5432
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=todos
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
