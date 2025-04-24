@@ -1,0 +1,34 @@
+{
+  "name": "mcp-streamable-http-host",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "dev": "tsx watch src/index.ts"
+  },
+  "keywords": [
+    "modelcontextprotocol",
+    "mcp",
+    "streamable",
+    "http"
+  ],
+  "author": "Wassim Chegham <github@wassim.dev>",
+  "license": "MIT",
+  "description": "",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.10.2",
+    "chalk": "^5.4.1",
+    "dotenv": "^16.5.0",
+    "type": "^2.7.3",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.24",
+    "tsx": "^4.19.3",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}
