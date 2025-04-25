@@ -1,35 +1,28 @@
+import type { Interface } from 'node:readline/promises';
 import { createInterface } from 'node:readline/promises';
-import type { AzureOpenAI, OpenAI } from 'openai';
 import type {
-  ChatCompletionMessageParam,
-  ChatCompletionTool,
+  ChatCompletionTool
 } from 'openai/resources/index.js';
+import { TodoAgent } from './agent.js';
 import { MCPClient as MCPClientHTTP } from './client-http.js';
-import { MCPClient as MCPClientSSE } from './client-see.js';
-import { llm, model } from './config/providers.js';
+import { MCPClient as MCPClientSSE } from './client-sse.js';
 import { MCPConfig, MCPSEEServerConfig, ZodToolType } from './config/types.js';
-import { mcpToolToOpenAiToolChatCompletion } from './helpers/openai-tool-adapter.js';
 import { logger } from './helpers/logs.js';
+import { mcpToolToOpenAiToolChatCompletion } from './helpers/openai-tool-adapter.js';
 
 const log = logger('host');
 
 export class MCPHost {
   private mcpClients: Array<MCPClientHTTP | MCPClientSSE> = [];
   private openAiTools: ChatCompletionTool[] = [];
-  private toolsMap: { [name: string]: MCPClientHTTP | MCPClientSSE } = {};
   private servers: { serverName: string; server: MCPSEEServerConfig }[] =
     [] as any;
 
-  private llm: AzureOpenAI | OpenAI | null = null;
-  private model: string = model;
+  private agent: TodoAgent = new TodoAgent();
   private config: MCPConfig | undefined;
   abortController: AbortController = new AbortController();
 
   constructor(config?: MCPConfig) {
-    if (!llm) {
-      throw new Error('The LLM provider client is not initialized');
-    }
-    this.llm = llm;
     this.config = config;
 
     process.stdin.setEncoding('utf8');
@@ -65,13 +58,7 @@ export class MCPHost {
           ...mcpTools.map(mcpToolToOpenAiToolChatCompletion),
         ];
 
-        this.toolsMap = {
-          ...this.toolsMap,
-          ...this.openAiTools.reduce((acc, tool) => {
-            acc[tool.function.name] = mcp;
-            return acc;
-          }, {} as any),
-        };
+        this.agent.addTools(mcp, this.openAiTools);
       }
       log.success('Connected to all MCP servers and loaded tools.');
     } catch (err: any) {
@@ -93,91 +80,6 @@ export class MCPHost {
     log.info('Closed all MCP client connections.');
   }
 
-  async query(query: string, stdout: any) {
-    log.info(`Received query: ${query}`);
-    const messages: ChatCompletionMessageParam[] = [
-      {
-        role: 'developer',
-        content: `You are a helpful assistant that can use tools to answer questions. Never use markdown, reply with plain text only. 
-          You have access to the following tools: ${this.openAiTools
-            .map((tool) => tool.function.name)
-            .join(', ')}.`,
-      },
-      {
-        role: 'user',
-        content: query,
-      },
-    ];
-
-    const stopAnimation = log.thinking();
-
-    let response = await this.llm!.chat.completions.create({
-      model: this.model,
-      max_tokens: 800,
-      messages,
-      tools: this.openAiTools,
-      parallel_tool_calls: false,
-    });
-
-    stopAnimation();
-
-    for await (const chunk of response.choices) {
-      const tools = chunk?.message.tool_calls;
-      const content = chunk?.message.content;
-      if (content) {
-        stdout.write(log.agent(content));
-      }
-
-      if (tools) {
-        messages.push(chunk?.message);
-
-        for await (const tool of tools) {
-          const toolName: string = tool.function.name;
-          const toolArgs: string = tool.function.arguments;
-          log.info(`Using tool '${toolName}' with arguments: ${toolArgs}`);
-
-          const mcpClient = this.toolsMap[toolName];
-          if (!mcpClient) {
-            log.warn(`Tool '${toolName}' not found. Skipping...`);
-            return;
-          }
-
-          const result = await mcpClient.callTool(toolName, toolArgs);
-          if (result.isError) {
-            log.error(`Tool '${toolName}' failed: ${result.error}`);
-            return;
-          }
-
-          const toolOutput = (result.content as any)[0].text;
-          log.success(`Tool '${toolName}' result: ${toolOutput}`);
-
-          messages.push({
-            role: 'tool',
-            tool_call_id: tool.id,
-            content: toolOutput.toString(),
-          });
-        }
-
-        const chat = await this.llm!.chat.completions.create({
-          model: this.model,
-          max_tokens: 800,
-          messages,
-          tools: this.openAiTools,
-        });
-
-        for await (const chunk of chat.choices) {
-          const message = chunk?.message.content;
-          if (message) {
-            stdout.write(log.agent(message));
-          }
-        }
-      }
-    }
-
-    stdout.write('\n');
-    log.info('Query completed.');
-  }
-
   async run() {
     const signal = this.abortController.signal;
     const rl = createInterface({
@@ -195,7 +97,7 @@ export class MCPHost {
 
       while (true) {
         const message = await rl.question(log.user(), { signal });
-        await this.query(message, rl);
+        await this.agent.query(message, rl);
       }
     } catch (err: any) {
       if (err.name === 'AbortError') {
