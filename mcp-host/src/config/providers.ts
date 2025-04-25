@@ -6,19 +6,21 @@ import {
   getBearerTokenProvider,
 } from '@azure/identity';
 import OpenAI, { AzureClientOptions, AzureOpenAI } from 'openai';
-import { logger } from '../helpers/logs.js';
 import { isRunningInDocker } from '../helpers/is-docker.js';
+import { logger } from '../helpers/logs.js';
 
 // You will need to set these environment variables or edit the following values
 const githubToken = process.env['GITHUB_TOKEN'] as string;
 const openaiApiKey = process.env['OPENAI_API_KEY'] as string;
 const azureOpenAiApiKey = process.env['AZURE_OPENAI_API_KEY'] as string;
 const endpoint = process.env['AZURE_OPENAI_ENDPOINT'] as string;
-const apiVersion = '2025-01-01-preview';
 const model = process.env['MODEL'] as string;
-let client: AzureOpenAI | OpenAI | null = null;
-
 const log = logger('providers');
+
+// This version uses the new OpenAI Responses API
+const apiVersion = '2025-03-01-preview';
+
+let client: AzureOpenAI | OpenAI | null = null;
 
 if (githubToken) {
   // Initialize the OpenAI client with GitHub token
@@ -36,13 +38,12 @@ if (githubToken) {
     apiKey: openaiApiKey,
   });
 } else if (endpoint) {
-  
   const opts: AzureClientOptions = {
     endpoint,
     apiVersion,
     deployment: model,
   };
-  
+
   if (azureOpenAiApiKey) {
     // Initialize the Azure OpenAI client with API Key
     log.info('Authentication method: Azure OpenAI API Key');
@@ -50,11 +51,11 @@ if (githubToken) {
   } else {
     if (isRunningInDocker()) {
       log.error(
-        `Azure Managed Identity is not supported in Docker. Please use an API key instead by setting the AZURE_OPENAI_API_KEY environment variable.`,
+        `Azure Managed Identity is not supported in Docker. Please use an API key instead by setting the AZURE_OPENAI_API_KEY environment variable.`
       );
       process.exit(1);
     }
-    
+
     // Initialize the Azure OpenAI client with Entra ID (Azure AD) authentication (keyless)
     log.info('Authentication method: Azure OpenAI Entra ID (keyless)');
     const credential = new DefaultAzureCredential();
@@ -65,4 +66,4 @@ if (githubToken) {
   client = new AzureOpenAI(opts);
 }
 
-export { client as llm, model };
+export { githubToken as isGitHubModels, client as llm, model };
