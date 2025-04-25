@@ -21,6 +21,7 @@
     "@modelcontextprotocol/sdk": "^1.10.2",
     "chalk": "^5.4.1",
     "debug": "^4.4.0",
+    "dotenv": "^16.5.0",
     "express": "^5.0.1",
     "pg": "^8.15.5",
     "pino": "^9.6.0",

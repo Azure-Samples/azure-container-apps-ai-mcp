@@ -1,11 +1,14 @@
+name: container-apps-ai-mcp
 services:
   mcp-host:
     build:
       context: ./mcp-host
     environment:
-      - NODE_ENV=production
       - MCP_SERVER_HTTP_URL=http://mcp-server-http:3000/mcp
       - MCP_SERVER_SSE_URL=http://mcp-server-sse:3001/sse
+      - DEBUG=
+      # Uncomment the line below to enable debug logging
+      - DEBUG=mcp:*
     env_file:
       - ./mcp-host/.env
     depends_on:
@@ -17,12 +20,10 @@ services:
     ports:
       - '3000:3000'
     environment:
-      - NODE_ENV=production
+      # override the hostname provided in the .env file
       - POSTGRES_HOST=host.docker.internal
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=todos
-      - POSTGRES_PORT=5432
+    env_file:
+      - ./mcp-host/.env
     depends_on:
       - postgres
   mcp-server-sse:
@@ -31,12 +32,10 @@ services:
     ports:
       - '3001:3001'
     environment:
-      - NODE_ENV=production
+      # override the hostname provided in the .env file
       - POSTGRES_HOST=host.docker.internal
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=todos
-      - POSTGRES_PORT=5432
+    env_file:
+      - ./mcp-host/.env
     depends_on:
       - postgres
 
