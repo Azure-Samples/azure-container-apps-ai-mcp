@@ -67,19 +67,13 @@ To get started with this project, follow the steps below:
 
 ### Installation
 
-1. Clone the repository:
+1. Clone the repository.
+2. Install the dependencies:
 
 ```bash
-git clone https://github.com/manekinekko/azure-openai-mcp-example.git
-cd azure-openai-mcp-example
-```
-
-3. Install the dependencies:
-
-```bash
-npm i --prefix mcp-host
-npm i --prefix mcp-server-http
-npm i --prefix mcp-server-sse
+npm install --prefix mcp-host
+npm install --prefix mcp-server-http
+npm install --prefix mcp-server-sse
 ```
 
 ### Configuring LLM providers to use
