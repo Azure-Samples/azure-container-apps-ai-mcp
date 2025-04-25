@@ -1,36 +1,33 @@
-import chalk from 'chalk';
+import chalk, { ChalkInstance } from 'chalk';
 import debug from 'debug';
 
-debug.enable('mcp:*');
+debug.enable('mcp:*'); // Enable all debug logs
 
 export const logger = (namespace: string) => {
   const dbg = debug('mcp:' + namespace);
-  const log = (...args: any[]) => {
-    // add timestamp to the log
+  const log = (colorize: ChalkInstance, ...args: any[]) => {
     const timestamp = new Date().toISOString();
-    const formattedArgs = args.map((arg) => {
+    const formattedArgs = [timestamp, ...args].map((arg) => {
       if (typeof arg === 'object') {
         return JSON.stringify(arg, null, 2);
       }
       return arg;
     });
-    const formattedMessage = formattedArgs.join(' ');
-    const message = `${chalk.gray(timestamp)} ${formattedMessage}`;
-    dbg(message);
+    dbg(colorize(formattedArgs.join(' ')));
   };
 
   return {
-    info(message: string, ...args: any[]) {
-      log(chalk.gray(`${message}`), ...args);
+    info(...args: any[]) {
+      log(chalk.cyan, ...args);
     },
-    success(message: string, ...args: any[]) {
-      log(chalk.gray(`${message}`), ...args);
+    success(...args: any[]) {
+      log(chalk.green, ...args);
     },
-    warn(message: string, ...args: any[]) {
-      log(chalk.gray(`${message}`), ...args);
+    warn(...args: any[]) {
+      log(chalk.yellow, ...args);
     },
-    error(message: string, ...args: any[]) {
-      log(chalk.gray(`${message}`), ...args);
+    error(...args: any[]) {
+      log(chalk.red, ...args);
     },
   };
 };
