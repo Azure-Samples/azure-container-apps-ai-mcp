@@ -5,7 +5,7 @@
       "url": "http://localhost:3000/mcp"
     },
     "mcp-server-sse": {
-      "type": "http",
+      "type": "sse",
       "url": "http://localhost:3001/sse"
     }
   }
