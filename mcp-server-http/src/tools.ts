@@ -2,7 +2,7 @@ import { addTodo, listTodos, completeTodo, deleteTodo } from './db.js';
 
 export const TodoTools = [
   {
-    name: 'add_todo',
+    name: 'http_add_todo',
     description:
       'Add a new TODO item to the list. Provide a title for the task you want to add. Returns a confirmation message with the new TODO id.',
     inputSchema: {
@@ -42,7 +42,7 @@ export const TodoTools = [
     },
   },
   {
-    name: 'list_todos',
+    name: 'http_list_todos',
     description:
       'List all TODO items. Returns a formatted list of all tasks with their ids, titles, and completion status.',
     inputSchema: {
@@ -87,7 +87,7 @@ export const TodoTools = [
     },
   },
   {
-    name: 'complete_todo',
+    name: 'http_complete_todo',
     description:
       'Mark a TODO item as completed. Provide the id of the task to mark as done. Returns a confirmation message or an error if the id does not exist.',
     inputSchema: {
@@ -127,7 +127,7 @@ export const TodoTools = [
     },
   },
   {
-    name: 'delete_todo',
+    name: 'http_delete_todo',
     description:
       'Delete a TODO item from the list. Provide the id of the task to delete. Returns a confirmation message or an error if the id does not exist.',
     inputSchema: {
