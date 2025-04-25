@@ -1,12 +1,12 @@
-import type { Interface } from 'node:readline/promises';
 import OpenAI, { AzureOpenAI } from 'openai';
 import type { ChatCompletionTool } from 'openai/resources/index.js';
 import { ChatCompletionMessageParam } from 'openai/resources/index.js';
+import { FunctionTool } from 'openai/resources/responses/responses.js';
 import type { MCPClient as MCPClientHTTP } from './client-http.js';
 import type { MCPClient as MCPClientSSE } from './client-sse.js';
 import { llm, model } from './config/providers.js';
+import { ZodToolType } from './config/types.js';
 import { logger } from './helpers/logs.js';
-import { FunctionTool } from 'openai/resources/responses/responses.js';
 
 const log = logger('agent');
 
@@ -23,8 +23,18 @@ export class TodoAgent {
     this.llm = llm;
   }
 
-  addTools(mcp: MCPClientHTTP | MCPClientSSE, tools: any[]) {
-    this.openAiTools = [...this.openAiTools, ...tools];
+  getTools() {
+    return this.openAiTools.map((tool) => ({
+      name: tool.function.name,
+      description: tool.function.description,
+    }));
+  }
+
+  appendTools(mcp: MCPClientHTTP | MCPClientSSE, mcpTools: ZodToolType[]) {
+    this.openAiTools = [
+      ...this.openAiTools,
+      ...mcpTools.map(TodoAgent.mcpToolToOpenAiToolChatCompletion),
+    ];
     this.toolsMap = {
       ...this.toolsMap,
       ...this.openAiTools.reduce((acc, tool) => {
@@ -34,7 +44,7 @@ export class TodoAgent {
     };
   }
 
-  async query(query: string, stdout: Interface) {
+  async *query(query: string) {
     log.info(`Received query: ${query}`);
     const messages: ChatCompletionMessageParam[] = [
       {
@@ -66,7 +76,7 @@ export class TodoAgent {
       const tools = chunk?.message.tool_calls;
       const content = chunk?.message.content;
       if (content) {
-        stdout.write(log.agent(content));
+        yield log.agent(content);
       }
 
       if (tools) {
@@ -109,13 +119,13 @@ export class TodoAgent {
         for await (const chunk of chat.choices) {
           const message = chunk?.message.content;
           if (message) {
-            stdout.write(log.agent(message));
+            yield log.agent(message);
           }
         }
       }
     }
 
-    stdout.write('\n');
+    yield '\n';
     log.info('Query completed.');
   }
 

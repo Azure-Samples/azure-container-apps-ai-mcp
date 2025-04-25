@@ -1,7 +1,4 @@
 import { createInterface } from 'node:readline/promises';
-import type {
-  ChatCompletionTool
-} from 'openai/resources/index.js';
 import { TodoAgent } from './agent.js';
 import { MCPClient as MCPClientHTTP } from './client-http.js';
 import { MCPClient as MCPClientSSE } from './client-sse.js';
@@ -12,13 +9,12 @@ const log = logger('host');
 
 export class MCPHost {
   private mcpClients: Array<MCPClientHTTP | MCPClientSSE> = [];
-  private openAiTools: ChatCompletionTool[] = [];
   private servers: { serverName: string; server: MCPSEEServerConfig }[] =
     [] as any;
 
   private agent: TodoAgent = new TodoAgent();
   private config: MCPConfig | undefined;
-  abortController: AbortController = new AbortController();
+  private abortController: AbortController = new AbortController();
 
   constructor(config?: MCPConfig) {
     this.config = config;
@@ -34,12 +30,11 @@ export class MCPHost {
       for (const serverName in this.config?.servers) {
         const server = this.config?.servers[serverName];
         let mcp: MCPClientHTTP | MCPClientSSE;
-        
+
         if (server.type === 'http') {
           log.info(`Connecting to HTTP server ${serverName} at ${server.url}`);
           mcp = new MCPClientHTTP(serverName, server.url);
-        }
-        else if (server.type === 'sse') {
+        } else if (server.type === 'sse') {
           log.info(`Connecting to SSE server ${serverName} at ${server.url}`);
           mcp = new MCPClientSSE(serverName, server.url);
         } else {
@@ -51,24 +46,19 @@ export class MCPHost {
         this.servers.push({ serverName, server });
 
         const mcpTools: ZodToolType[] = (await mcp.getAvailableTools()) || [];
-        this.openAiTools = [
-          ...this.openAiTools,
-          ...mcpTools.map(TodoAgent.mcpToolToOpenAiToolChatCompletion),
-        ];
-
-        this.agent.addTools(mcp, this.openAiTools);
+        this.agent.appendTools(mcp, mcpTools);
       }
       log.success('Connected to all MCP servers and loaded tools.');
     } catch (err: any) {
-      log.error('Failed to connect to MCP server:', err?.cause?.code || err?.message || err);
+      log.error(
+        'Failed to connect to MCP server:',
+        err?.cause?.code || err?.message || err
+      );
     }
   }
 
   getAvailableTools() {
-    return this.openAiTools.map((tool) => ({
-      name: tool.function.name,
-      description: tool.function.description,
-    }));
+    return this.agent.getTools();
   }
 
   async close() {
@@ -90,18 +80,19 @@ export class MCPHost {
       log.info('Connected to the following servers:', this.servers);
       log.info(
         'Available tools:',
-        this.openAiTools.map((tool) => tool.function.name)
+        this.agent.getTools().map((tool) => tool.name)
       );
 
       while (true) {
         const message = await rl.question(log.user(), { signal });
-        await this.agent.query(message, rl);
+        for await (const response of this.agent.query(message)) {
+          rl.write(log.agent(response));
+        }
       }
     } catch (err: any) {
       if (err.name === 'AbortError') {
         log.info('Process aborted. Exiting...');
-      }
-      else {
+      } else {
         log.error('Error:', err?.cause?.code || err?.message || err);
       }
     } finally {
