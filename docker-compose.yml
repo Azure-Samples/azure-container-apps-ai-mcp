@@ -6,6 +6,8 @@ services:
       - NODE_ENV=production
       - MCP_SERVER_HTTP_URL=http://mcp-server-http:3000/mcp
       - MCP_SERVER_SSE_URL=http://mcp-server-sse:3001/sse
+    env_file:
+      - ./mcp-host/.env
     depends_on:
       - mcp-server-http
       - mcp-server-sse
