@@ -1,4 +1,3 @@
-import type { Interface } from 'node:readline/promises';
 import { createInterface } from 'node:readline/promises';
 import type {
   ChatCompletionTool
@@ -8,7 +7,6 @@ import { MCPClient as MCPClientHTTP } from './client-http.js';
 import { MCPClient as MCPClientSSE } from './client-sse.js';
 import { MCPConfig, MCPSEEServerConfig, ZodToolType } from './config/types.js';
 import { logger } from './helpers/logs.js';
-import { mcpToolToOpenAiToolChatCompletion } from './helpers/openai-tool-adapter.js';
 
 const log = logger('host');
 
@@ -55,7 +53,7 @@ export class MCPHost {
         const mcpTools: ZodToolType[] = (await mcp.getAvailableTools()) || [];
         this.openAiTools = [
           ...this.openAiTools,
-          ...mcpTools.map(mcpToolToOpenAiToolChatCompletion),
+          ...mcpTools.map(TodoAgent.mcpToolToOpenAiToolChatCompletion),
         ];
 
         this.agent.addTools(mcp, this.openAiTools);

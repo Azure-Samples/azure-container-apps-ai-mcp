@@ -1,10 +1,12 @@
 import type { Interface } from 'node:readline/promises';
 import OpenAI, { AzureOpenAI } from 'openai';
+import type { ChatCompletionTool } from 'openai/resources/index.js';
 import { ChatCompletionMessageParam } from 'openai/resources/index.js';
-import { llm, model } from './config/providers.js';
-import { logger } from './helpers/logs.js';
 import type { MCPClient as MCPClientHTTP } from './client-http.js';
 import type { MCPClient as MCPClientSSE } from './client-sse.js';
+import { llm, model } from './config/providers.js';
+import { logger } from './helpers/logs.js';
+import { FunctionTool } from 'openai/resources/responses/responses.js';
 
 const log = logger('agent');
 
@@ -13,8 +15,11 @@ export class TodoAgent {
   private model: string = model;
   private toolsMap: { [name: string]: MCPClientHTTP | MCPClientSSE } = {};
 
-  private openAiTools: any[] = [];
+  private openAiTools: ChatCompletionTool[] = [];
   constructor() {
+    if (!llm) {
+      throw new Error('LLM provider is not initialized');
+    }
     this.llm = llm;
   }
 
@@ -112,5 +117,62 @@ export class TodoAgent {
 
     stdout.write('\n');
     log.info('Query completed.');
+  }
+
+  static zodSchemaToParametersSchema(zodSchema: any): {
+    type: string;
+    properties: Record<string, any>;
+    required: string[];
+    additionalProperties: boolean;
+  } {
+    const properties: Record<string, any> = zodSchema.properties || {};
+    const required: string[] = zodSchema.required || [];
+    const additionalProperties: boolean =
+      zodSchema.additionalProperties !== undefined
+        ? zodSchema.additionalProperties
+        : false;
+
+    return {
+      type: 'object',
+      properties,
+      required,
+      additionalProperties,
+    };
+  }
+
+  static mcpToolToOpenAiToolChatCompletion(tool: {
+    name: string;
+    description?: string;
+    inputSchema: any;
+  }): ChatCompletionTool {
+    return {
+      type: 'function',
+      function: {
+        strict: true,
+        name: tool.name,
+        description: tool.description,
+        parameters: {
+          ...TodoAgent.zodSchemaToParametersSchema(tool.inputSchema),
+        },
+      },
+    };
+  }
+
+  static mcpToolToOpenAiToolResponses(tool: {
+    name: string;
+    description?: string;
+    inputSchema: any;
+  }): FunctionTool {
+    return {
+      type: 'function',
+      strict: true,
+      name: tool.name,
+      description: tool.description,
+      parameters: {
+        parameters: {
+          ...TodoAgent.zodSchemaToParametersSchema(tool.inputSchema),
+        },
+      },
+    };
   }
 }
