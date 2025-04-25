@@ -51,7 +51,7 @@ export class TodoAgent {
         role: 'developer',
         content: `You are a helpful assistant that can use tools to answer questions. Never use markdown, reply with plain text only. 
           You have access to the following tools: ${this.openAiTools
-            .map((tool) => tool.function.name)
+            .map((tool) => `${tool.function.name}: ${tool.function.description}`)
             .join(', ')}.`,
       },
       {
