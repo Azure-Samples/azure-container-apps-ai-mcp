@@ -6,7 +6,6 @@ import {
   getBearerTokenProvider,
 } from '@azure/identity';
 import OpenAI, { AzureClientOptions, AzureOpenAI } from 'openai';
-import { isRunningInDocker } from '../helpers/is-docker.js';
 import { logger } from '../helpers/logs.js';
 
 // You will need to set these environment variables or edit the following values
@@ -49,12 +48,6 @@ if (githubToken) {
     log.info('Authentication method: Azure OpenAI API Key');
     opts.apiKey = azureOpenAiApiKey;
   } else {
-    if (isRunningInDocker()) {
-      log.error(
-        `Azure Managed Identity is not supported in Docker. Please use an API key instead by setting the AZURE_OPENAI_API_KEY environment variable.`
-      );
-      process.exit(1);
-    }
 
     // Initialize the Azure OpenAI client with Entra ID (Azure AD) authentication (keyless)
     log.info('Authentication method: Azure OpenAI Entra ID (keyless)');

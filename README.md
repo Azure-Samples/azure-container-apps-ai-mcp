@@ -1,11 +1,12 @@
 # Azure Container Apps - AI & MCP Playground
 
-This project showcases how to use the MCP protocol with OpenAI, Azure OpenAI and GitHub Models. It provides a simple demo terminal application that interacts with a TODO list Agent. 
+This project showcases how to use the MCP protocol with OpenAI, Azure OpenAI and GitHub Models. It provides a simple demo terminal application that interacts with a TODO list Agent.
 The agent has access to a set of tools provided by the MCP server.
 
 ## MCP Components
 
 The current implementation consists of three main components:
+
 1. **MCP Host**: The main application that interacts with the MCP server and the LLM provider. The host instanciates an LLM provider and provides a terminal interface for the user to interact with the agent.
 2. **MCP Client**: The client that communicates with the MCP server using the MCP protocol. The application providers two MCP clients for both HTTP and SSE (Server-Sent Events) protocols.
 3. **MCP Server**: The server that implements the MCP protocol and communicates with the Postgres database. The application provides two MCP server implementations: one using HTTP and the other using SSE (Server-Sent Events).
@@ -13,7 +14,7 @@ The current implementation consists of three main components:
 5. **Postgres**: A database used to store the state of the agent and the tools.
 6. **Tools**: A set of tools that the agent can use to perform actions, such as adding or listing items in a shopping list.
 
-```mermaid  
+```mermaid
 flowchart TD
   User[User]
   Host[MCP Host]
@@ -41,12 +42,11 @@ flowchart TD
 
 This demo application provides two MCP server implementations: one using HTTP and the other using SSE (Server-Sent Events). The MCP host can connect to both servers, allowing you to choose the one that best fits your needs.
 
-
 | Feature             | Completed |
 | ------------------- | --------- |
 | SSE (legacy)        | ✅        |
 | HTTP Streaming      | ✅        |
-| AuthN (token based) | wip        |
+| AuthN (token based) | wip       |
 | Tools               | ✅        |
 | Resources           | #3        |
 | Prompts             | #4        |
@@ -80,9 +80,11 @@ npm install --prefix mcp-server-sse
 
 This sample supports the follwowing LLM providers:
 
-- Azure OpenAI,
-- OpenAI,
-- GitHub Models.
+| Provider      | Supported API      | 
+| ------------- | ------------------ | 
+| Azure OpenAI  | Responses API      | 
+| OpenAI        | Responses API      | 
+| GitHub Models | ChatCompletion API | 
 
 #### Azure OpenAI
 
@@ -95,7 +97,7 @@ In order to use Keyless authentication, using Azure Managed Identity, you need t
 AZURE_OPENAI_ENDPOINT="https://<ai-foundry-openai-project>.openai.azure.com"
 MODEL="gpt-4.1"
 
-# Also, please use API Key when running the MCP host in a Docker container (locally).
+# (optional) Set the Azure OpenAI API key if you are not using Managed Identity
 # AZURE_OPENAI_API_KEY=your_azure_openai_api_key
 ```
 
@@ -122,7 +124,18 @@ To use the GitHub models, you need to set your `GITHUB_TOKEN` in the `.env` file
 GITHUB_TOKEN=your_github_token
 MODEL="openai/gpt-4.1"
 ```
+
 ### Running the MCP servers
+
+## Running in DevContainer (recommended)
+
+This project includes a DevContainer configuration that allows you to run the MCP servers in a containerized environment. This is the recommended way to run the MCP servers, as it ensures that all dependencies are installed and configured correctly.
+
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/manekinekko/azure-container-apps-ai-mcp)
+[![Open in Dev Containers](https://img.shields.io/static/v1?style=for-the-badge&label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/manekinekko/azure-container-apps-ai-mcp)
+
+Once you have opened the project in a DevContainer, you can run the MCP servers using the following the Docker section below.
+
 ## Running in Docker
 
 You can run both MCP servers in Docker containers using the provided Docker Compose file. This is useful for testing and development purposes. To do this, follow these steps:
@@ -154,7 +167,7 @@ npm start --prefix mcp-server-sse
 ```
 
 > [!NOTE]
-> For demo purposes, the MCP host (see below) is configured to connect to both servers (on port 3000 and 3001). However, this is not a requirement, and you can choose which server to use.
+> For demo purposes, the MCP host (see below) is configured to connect to both servers (on port 3000 and 3001). However, this is not a requirement, and you can choose which server to use. If a server is not available, the host will print an error and continue to scan for other servers. If no server is available, no tools will be available to the agent.
 
 1. Run the MCP host in a separate terminal:
 
@@ -163,7 +176,6 @@ npm start --prefix mcp-host
 ```
 
 You should be able to use the MCP host to interat with the LLM agent. Try asking question about adding or listing items in a shopping list. The host will then try to fetch and call tools from the MCP servers.
-
 
 ## Debugging and inspection
 
