@@ -44,7 +44,7 @@ export class SSEPServer {
       await this.server.connect(this.transport);
       log.success('Transport connected. Handling request...');
     } catch (error) {
-      log.error('Error handling MCP request: %O', error);
+      log.error('Error handling MCP request:', error);
       if (!res.headersSent) {
         res
           .status(500)
@@ -55,7 +55,7 @@ export class SSEPServer {
   }
 
   async handlePostRequest(req: Request, res: Response) {
-    log.info(`POST ${req.originalUrl} (${req.ip}) - payload: %O`, req.body);
+    log.info(`POST ${req.originalUrl} (${req.ip}) - payload:`, req.body);
 
     const transport = this.transports[req.query.sessionId as string];
     if (transport) {

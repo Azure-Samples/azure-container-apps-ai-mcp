@@ -75,9 +75,7 @@ export class MCPHost {
       }
       log.success('Connected to all MCP servers and loaded tools.');
     } catch (err: any) {
-      console.error({err})
-      log.error('Failed to connect to MCP server: %O', err?.cause?.code || err);
-      process.exit(1);
+      log.error('Failed to connect to MCP server:', err?.cause?.code || err?.message || err);
     }
   }
 
@@ -136,7 +134,7 @@ export class MCPHost {
         for await (const tool of tools) {
           const toolName: string = tool.function.name;
           const toolArgs: string = tool.function.arguments;
-          log.info(`Using tool '${toolName}' with args: ${toolArgs}`);
+          log.info(`Using tool '${toolName}' with arguments: ${toolArgs}`);
 
           const mcpClient = this.toolsMap[toolName];
           if (!mcpClient) {
@@ -189,9 +187,9 @@ export class MCPHost {
 
     try {
       log.success('MCP Host Started!');
-      log.info('Connected to the following servers: %O', this.servers);
+      log.info('Connected to the following servers:', this.servers);
       log.info(
-        'Available tools: %O',
+        'Available tools:',
         this.openAiTools.map((tool) => tool.function.name)
       );
 
@@ -200,7 +198,12 @@ export class MCPHost {
         await this.query(message, rl);
       }
     } catch (err: any) {
-      log.error('Error: %O', err?.cause?.code || err);
+      if (err.name === 'AbortError') {
+        log.info('Process aborted. Exiting...');
+      }
+      else {
+        log.error('Error:', err?.cause?.code || err?.message || err);
+      }
     } finally {
       rl.close();
       await this.close();

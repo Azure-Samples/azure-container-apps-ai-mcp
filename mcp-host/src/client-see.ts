@@ -43,7 +43,7 @@ export class MCPClient {
   }
 
   async callTool(name: string, toolArgs: string) {
-    log.info('Calling tool %s with args %s', name, toolArgs);
+    log.info(`Calling tool ${name} with arguments:`, toolArgs);
 
     return await this.client.callTool({
       name,

@@ -37,7 +37,7 @@ export class StreamableHTTPServer {
   }
 
   async handlePostRequest(req: Request, res: Response) {
-    log.info(`POST ${req.originalUrl} (${req.ip}) - payload: %O`, req.body);
+    log.info(`POST ${req.originalUrl} (${req.ip}) - payload:`, req.body);
     try {
       const transport = new StreamableHTTPServerTransport({
         sessionIdGenerator: undefined,
@@ -60,7 +60,7 @@ export class StreamableHTTPServer {
         `POST request handled successfully (status=${res.statusCode})`
       );
     } catch (error) {
-      log.error('Error handling MCP request: %O', error);
+      log.error('Error handling MCP request:', error);
       if (!res.headersSent) {
         res
           .status(500)
@@ -90,20 +90,27 @@ export class StreamableHTTPServer {
           log.error(`Tool ${toolName} not found.`);
           return this.createRPCErrorResponse(`Tool ${toolName} not found.`);
         }
-        const result = await tool.execute(args as any);
-        log.success(`Tool ${toolName} executed. Result: %O`, result);
-
-        return {
-          jsonrpc: JSON_RPC,
-          content: [
-            {
-              type: 'text',
-              text: `Tool ${toolName} executed with arguments ${JSON.stringify(
-                args
-              )}. Result: ${JSON.stringify(result)}`,
-            },
-          ],
-        };
+        try {
+          const result = await tool.execute(args as any);
+          log.success(`Tool ${toolName} executed. Result:`, result);
+          return {
+            jsonrpc: JSON_RPC,
+            content: [
+              {
+                type: 'text',
+                text: `Tool ${toolName} executed with arguments ${JSON.stringify(
+                  args
+                )}. Result: ${JSON.stringify(result)}`,
+              },
+            ],
+          };
+        }
+        catch (error) {
+          log.error(`Error executing tool ${toolName}:`, error);
+          return this.createRPCErrorResponse(
+            `Error executing tool ${toolName}: ${error}`
+          );
+        }
       }
     );
   }
