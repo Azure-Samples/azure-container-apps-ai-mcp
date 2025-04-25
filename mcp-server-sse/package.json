@@ -1,5 +1,5 @@
 {
-  "name": "mcp-server-sse",
+  "name": "azure-container-apps-ai-mcp-server-sse",
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",
@@ -8,10 +8,15 @@
     "build": "tsc",
     "dev": "tsx watch src/index.ts"
   },
-  "keywords": [],
+  "keywords": [
+    "modelcontextprotocol",
+    "mcp",
+    "mcp-server",
+    "sse"
+  ],
   "author": "Wassim Chegham <github@wassim.dev>",
   "license": "MIT",
-  "description": "",
+  "description": "An MCP server that implements the MCP protocol using SSE and communicates with the Postgres database.",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.10.2",
     "chalk": "^5.4.1",
@@ -32,6 +37,6 @@
     "typescript": "^5.3.3"
   },
   "engines": {
-    "node": ">=23.0.0"
+    "node": ">=22.0.0"
   }
 }

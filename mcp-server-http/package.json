@@ -1,5 +1,5 @@
 {
-  "name": "mcp-server-http",
+  "name": "azure-container-apps-ai-mcp-server-http",
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",
@@ -11,12 +11,13 @@
   "keywords": [
     "modelcontextprotocol",
     "mcp",
+    "mcp-server",
     "streamable",
     "http"
   ],
   "author": "Wassim Chegham <github@wassim.dev>",
   "license": "MIT",
-  "description": "",
+  "description": "An MCP server that implements the MCP protocol using Streamable HTTP and communicates with the Postgres database.",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.10.2",
     "chalk": "^5.4.1",
