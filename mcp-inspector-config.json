@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "mcp-server-http": {
+      "---": "Not yet supported. See https://github.com/modelcontextprotocol/inspector/issues/255",
+      "type": "http",
+      "url": "http://localhost:3000/http",
+      "env": {}
+    },
+    "mcp-server-sse": {
+      "type": "http",
+      "url": "http://localhost:3001/sse",
+      "env": {}
+    }
+  }
+}
