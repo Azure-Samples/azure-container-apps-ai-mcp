@@ -15,22 +15,22 @@ export const logger = (namespace: string) => {
       return arg;
     });
     const formattedMessage = formattedArgs.join(' ');
-    const message = `${chalk.yellow(timestamp)} ${formattedMessage}`;
+    const message = `${chalk.gray(timestamp)} ${formattedMessage}`;
     dbg(message);
   };
 
   return {
     info(message: string, ...args: any[]) {
-      log(chalk.blue(`${message}`), ...args);
+      log(chalk.gray(`${message}`), ...args);
     },
     success(message: string, ...args: any[]) {
-      log(chalk.green(`${message}`), ...args);
+      log(chalk.gray(`${message}`), ...args);
     },
     warn(message: string, ...args: any[]) {
-      log(chalk.yellow(`${message}`), ...args);
+      log(chalk.gray(`${message}`), ...args);
     },
     error(message: string, ...args: any[]) {
-      log(chalk.red(`${message}`), ...args);
+      log(chalk.gray(`${message}`), ...args);
     },
   };
 };
