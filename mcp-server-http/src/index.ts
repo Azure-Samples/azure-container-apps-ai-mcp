@@ -2,6 +2,7 @@ import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import express, { Request, Response } from 'express';
 import { StreamableHTTPServer } from './server.js';
 import { logger } from './helpers/logs.js';
+import { hostname } from 'node:os';
 const log = logger('index');
 
 const server = new StreamableHTTPServer(
@@ -37,7 +38,7 @@ app.use('/', router);
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   log.success(`MCP Stateless Streamable HTTP Server`);
-  log.success(`MCP endpoint: http://localhost:${PORT}${MCP_ENDPOINT}`);
+  log.success(`MCP endpoint: http://${hostname()}:${PORT}${MCP_ENDPOINT}`);
   log.success(`Press Ctrl+C to stop the server`);
 });
 

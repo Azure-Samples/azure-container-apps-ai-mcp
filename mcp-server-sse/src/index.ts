@@ -2,6 +2,7 @@ import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import express, { Request, Response } from 'express';
 import { logger } from './helpers/logs.js';
 import { SSEPServer } from './server.js';
+import { hostname } from 'node:os';
 
 const log = logger('index');
 
@@ -39,7 +40,7 @@ app.use('/', router);
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   log.success(`MCP SSE Server`);
-  log.success(`MCP SSE endpoint: http://localhost:${PORT}/sse`);
+  log.success(`MCP SSE endpoint: http://${hostname()}:${PORT}/sse`);
   log.success(`Press Ctrl+C to stop the server`);
 });
 
