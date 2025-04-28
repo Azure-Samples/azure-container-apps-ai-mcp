@@ -16,25 +16,58 @@ The current implementation consists of three main components:
 
 ```mermaid
 flowchart TD
-  User[User]
-  Host[MCP Host]
-  ClientSSE[MCP Client SSE]
-  ClientHTTP[MCP Client HTTP]
-  ServerSSE[MCP Server SSE]
-  ServerHTTP[MCP Server HTTP]
-  Postgres[Postgres DB]
-  Tools[Tools]
-  LLM[Azure OpenAI / OpenAI / GitHub Models]
+    user(("fa:fa-users User"))
+    host["VS Code, Copilot, LlamaIndex, Langchain..."]
+    client[MCP SSE Client]
+    clientHttp[MCP HTTP Client]
+    server([MCP SSE Server])
+    serverHttp([MCP HTTP Server])
+    agent[Agent]
+    AzureOpenAI([Azure OpenAI])
+    GitHub([GitHub Models])
+    OpenAI([OpenAI])
+    
+    tools["fa:fa-wrench Tools"]
+    db[(Postgres DB)]
 
-  User --> |Terminal| Host
-  Host --> |MCP Client| ClientSSE
-  Host --> |MCP Client| ClientHTTP
-  Host <--> |LLM Provider| LLM
-  ClientSSE --> |Server Sent Events| ServerSSE
-  ClientHTTP --> |Streamable HTTP| ServerHTTP
-  ServerSSE --> Tools
-  ServerHTTP --> Tools
-  Tools --> |CRUD| Postgres
+    user --> hostGroup 
+    subgraph hostGroup["MCP Host"]
+        host -.- client & clientHttp & agent
+    end
+    
+    agent -.- AzureOpenAI & GitHub & OpenAI
+    
+    client a@ ---> |"Server Sent Events"| server
+    clientHttp aa@ ---> |"Streamable HTTP"| serverHttp
+
+    subgraph container["ACA Container (*)"]
+      server -.- tools
+      serverHttp -.- tools
+      tools -.- add_todo 
+      tools -.- list_todos
+      tools -.- complete_todo
+      tools -.- delete_todo
+    end
+
+    add_todo b@ --> db
+    list_todos c@--> db
+    complete_todo d@ --> db
+    delete_todo e@ --> db
+    
+    %% styles
+
+    classDef animate stroke-dasharray: 9,5,stroke-dashoffset: 900,animation: dash 25s linear infinite;
+    classDef highlight fill:#9B77E8,color:#fff,stroke:#5EB4D8,stroke-width:2px
+    
+    class a animate
+    class aa animate
+    class b animate
+    class c animate
+    class d animate
+    class e animate
+
+    class container highlight
+
 
 ```
 
