@@ -17,14 +17,14 @@
   ],
   "author": "Wassim Chegham <github@wassim.dev>",
   "license": "MIT",
-  "description": "An MCP server that implements the MCP protocol using Streamable HTTP and communicates with the Postgres database.",
+  "description": "An MCP server that implements the MCP protocol using Streamable HTTP and communicates with the MongoDB database.",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.10.2",
     "chalk": "^5.4.1",
     "debug": "^4.4.0",
     "dotenv": "^16.5.0",
     "express": "^5.0.1",
-    "pg": "^8.15.5",
+    "mongodb": "^6.18.0",
     "pino": "^9.6.0",
     "type": "^2.7.3",
     "zod": "^3.24.2"
@@ -33,7 +33,6 @@
     "@types/debug": "^4.1.12",
     "@types/express": "^5.0.0",
     "@types/node": "^20.11.24",
-    "@types/pg": "^8.11.14",
     "tsx": "^4.19.3",
     "typescript": "^5.3.3"
   },

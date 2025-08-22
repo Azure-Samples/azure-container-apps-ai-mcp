@@ -5,9 +5,7 @@ services:
       context: ./mcp-host
     environment:
       - MCP_SERVER_HTTP_URL=http://mcp-server-http:3000/mcp
-      - MCP_SERVER_SSE_URL=http://mcp-server-sse:3001/sse
-      - DEBUG=
-      # Uncomment the line below to enable debug logging
+      # Comment the line below to disable debug logging
       - DEBUG=mcp:*
     env_file:
       - ./mcp-host/.env
@@ -21,39 +19,35 @@ services:
       - '3000:3000'
     environment:
       # override the hostname provided in the .env file
-      - POSTGRES_HOST=host.docker.internal
+      - DB_HOST=host.docker.internal
     env_file:
-      - ./mcp-host/.env
+      - ./mcp-server-http/.env
     depends_on:
-      - postgres
+      - documentdb
+
   mcp-server-sse:
     build:
       context: ./mcp-server-sse
     ports:
-      - '3001:3001'
+      - '3001:3000'
     environment:
       # override the hostname provided in the .env file
-      - POSTGRES_HOST=host.docker.internal
+      - DB_HOST=host.docker.internal
     env_file:
-      - ./mcp-host/.env
+      - ./mcp-server-sse/.env
     depends_on:
-      - postgres
+      - documentdb
 
-  postgres:
-    image: postgres:16-alpine
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=todos
+  documentdb:
+    image: ghcr.io/microsoft/documentdb/documentdb-local:latest
     ports:
-      - '5432:5432'
+      - "10260:10260"
+    environment:
+      - USERNAME=admin
+      - PASSWORD=123
     volumes:
-      - pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d todos"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+      - dbdata:/var/lib/documentdb/data
+    restart: unless-stopped
 
 volumes:
-  pgdata:
+  dbdata:
