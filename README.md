@@ -9,9 +9,9 @@ The current implementation consists of three main components:
 
 1. **MCP Host**: The main application that interacts with the MCP server and the LLM provider. The host instanciates an LLM provider and provides a terminal interface for the user to interact with the agent.
 2. **MCP Client**: The client that communicates with the MCP server using the MCP protocol. The application providers two MCP clients for both HTTP and SSE (Server-Sent Events) protocols.
-3. **MCP Server**: The server that implements the MCP protocol and communicates with the Postgres database. The application provides two MCP server implementations: one using HTTP and the other using SSE (Server-Sent Events).
+3. **MCP Server**: The server that implements the MCP protocol and communicates with the DocumentDB database. The application provides two MCP server implementations: one using HTTP and the other using SSE (Server-Sent Events).
 4. **LLM Provider**: The language model provider (e.g., OpenAI, Azure OpenAI, GitHub Models) that generates responses based on the input from the MCP host.
-5. **Postgres**: A database used to store the state of the agent and the tools.
+5. **DocumentDB Local**: A database used to store the state of the agent and the tools.
 6. **Tools**: A set of tools that the agent can use to perform actions, such as adding or listing items in a shopping list.
 
 ```mermaid
@@ -28,7 +28,7 @@ flowchart TD
     OpenAI([OpenAI])
     
     tools["fa:fa-wrench Tools"]
-    db[(Postgres DB)]
+    db[(DocumentDB Local)]
 
     user --> hostGroup 
     subgraph hostGroup["MCP Host"]
@@ -92,7 +92,7 @@ To get started with this project, follow the steps below:
 ### Prerequisites
 
 - Node.js and npm (version 22 or higher)
-- Docker (recommended for running the MCP servers, and Postgres in Docker)
+- Docker (recommended for running the MCP servers, and DocumentDB Local in Docker)
 - An OpenAI compatible endpoint:
   - An OpenAI API key
   - Or, a GitHub token, if you want to use the GitHub models: https://gh.io/models
@@ -146,7 +146,7 @@ To use the OpenAI API, you need to set your `OPENAI_API_KEY` key in the `.env` f
 
 ```env
 OPENAI_API_KEY=your_openai_api_key
-MODEL="gpt-4.1"
+MODEL="gpt-5"
 ```
 
 #### GitHub Models
@@ -155,7 +155,7 @@ To use the GitHub models, you need to set your `GITHUB_TOKEN` in the `.env` file
 
 ```env
 GITHUB_TOKEN=your_github_token
-MODEL="openai/gpt-4.1"
+MODEL="openai/gpt-5"
 ```
 
 ### Running the MCP servers
@@ -180,7 +180,7 @@ You can run both MCP servers in Docker containers using the provided Docker Comp
 docker compose up -d --build
 ```
 
-This command will build and start the HTTP and SSE MCP servers, as well as the Postgres database container.
+This command will build and start the HTTP and SSE MCP servers, as well as the DocumentDB database container.
 
 3. Access the MCP host terminal by running the following command in a separate terminal:
 
