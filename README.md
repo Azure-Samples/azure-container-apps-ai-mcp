@@ -11,7 +11,7 @@ The current implementation consists of three main components:
 2. **MCP Client**: The client that communicates with the MCP server using the MCP protocol. The application providers two MCP clients for both HTTP and SSE (Server-Sent Events) protocols.
 3. **MCP Server**: The server that implements the MCP protocol and communicates with the DocumentDB database. The application provides two MCP server implementations: one using HTTP and the other using SSE (Server-Sent Events).
 4. **LLM Provider**: The language model provider (e.g., OpenAI, Azure OpenAI, GitHub Models) that generates responses based on the input from the MCP host.
-5. **DocumentDB Local**: A database used to store the state of the agent and the tools.
+5. **[DocumentDB Local](https://github.com/microsoft/documentdb)**: A database used to store the state of the agent and the tools.
 6. **Tools**: A set of tools that the agent can use to perform actions, such as adding or listing items in a shopping list.
 
 ```mermaid
@@ -68,7 +68,6 @@ flowchart TD
 
     class container highlight
 
-
 ```
 
 ## MCP Server supported features and capabilities
@@ -85,7 +84,26 @@ This demo application provides two MCP server implementations: one using HTTP an
 | Prompts             | #4        |
 | Sampling            | #5        |
 
-## Getting Started
+## Quick Start (using Docker)
+
+To get started with this project using Docker, follow the steps below:
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/Azure-Samples/azure-container-apps-ai-mcp.git
+cd azure-container-apps-ai-mcp
+```
+
+2. Start the Docker containers:
+
+```bash
+docker-compose up
+```
+
+3. Access the MCP servers using VS Code built-in MPC support, see [./.vscode/mcp.json](./.vscode/mcp.json). All data will be persisted in the DocumentDB Local database. You can use the [VS Code extension for DocumentDB](https://github.com/microsoft/vscode-documentdb) to explore the database.
+
+## Local development
 
 To get started with this project, follow the steps below:
 
