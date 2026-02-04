@@ -24,7 +24,7 @@
   "description": "An MCP host application that interacts with the MCP server and the LLM provider. The host instanciates an LLM provider and provides a terminal interface for the user to interact with the agent.",
   "dependencies": {
     "@azure/identity": "^4.9.1",
-    "@modelcontextprotocol/sdk": "^1.10.2",
+    "@modelcontextprotocol/sdk": "^1.26.0",
     "chalk": "^5.4.1",
     "debug": "^4.4.0",
     "dotenv": "^16.5.0",
